@@ -1,0 +1,7 @@
+.DS_Store
+junit.xml
+*.fasl
+scratch.lisp
+*.old
+/coverage/
+/.test/*
