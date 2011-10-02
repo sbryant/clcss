@@ -12,10 +12,16 @@
   (:method ((form symbol))
     (equal form :word)))
 
+(def-criterion-alias (:is-word) '(:predicate is-word))
+
+(def-criterion-alias (:word value) `(:seq :is-word
+                                          (:equal ,value)))
+
+;; Groups
 (def-test-group parse-tests ()
   (:documentation "Tests basics of CSS string parsing"))
 
-;; Root
+;; Root Group
 (def-test-group all-tests ()
   (:documentation "Root of the test tree")
   (:include-groups parse-tests))
@@ -26,12 +32,11 @@
     (:not :true) (read-css ""))
 
 (def-test (can-parse-simple-element :group parse-tests)
-    (:all (:apply caar (:equal :word))
-          (:apply cadar (:equal :h1)))
+    (:seq (:word :h1))
   (read-css "h1"))
 
 (def-test (can-parse-nested-elements :group parse-tests
                                      :fixtures parse-helpers)
-    (:all (:seq (:seq (:predicate is-word) (:equal :div))
-                (:seq (:predicate is-word) (:equal :span))))
+    (:seq (:word :div)
+          (:word :span))
   (read-css "div span"))
