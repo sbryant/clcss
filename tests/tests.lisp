@@ -1,9 +1,4 @@
-(defpackage :clcss-tests
-  (:export
-   #:*css-tests*)
-  (:use :cl :clcss))
-
-(in-package :clcss)
+(in-package :clcss-tests)
 
 (defparameter *css-tests* `("h1" "div span" "div span p#poop" "ul#nav"
                             "#my-id" ".my-class" "div#body" "div.my-class" ".indent p"))
