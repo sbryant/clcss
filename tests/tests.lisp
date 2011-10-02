@@ -3,7 +3,12 @@
 (defparameter *css-tests* `("h1" "div span" "div span p#poop" "ul#nav"
                             "#my-id" ".my-class" "div#body" "div.my-class" ".indent p"))
 
-;; Suites
+(defgeneric is-word (form)
+  (:method ((form list))
+    (is-word (car form)))
+  (:method ((form symbol))
+    (equal form :word)))
+
 (def-test-group parse-tests ()
   (:documentation "Tests basics of CSS string parsing"))
 
@@ -21,3 +26,9 @@
     (:all (:apply caar (:equal :word))
           (:apply cadar (:equal :h1)))
   (read-css "h1"))
+
+(def-test (can-parse-nested-elements :group parse-tests
+                                     :fixtures parse-helpers)
+    (:all (:seq (:seq (:predicate is-word) (:equal :div))
+                (:seq (:predicate is-word) (:equal :span))))
+  (read-css "div span"))
