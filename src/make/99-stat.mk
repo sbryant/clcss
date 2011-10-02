@@ -10,7 +10,7 @@ locs-src:
 
 locs-tests:
 	@echo "=> Tests lines"
-	@find $(ROOT)/tests -name '*.lisp' | xargs wc -l | grep total
+	@find $(ROOT)/tests -name '*.lisp' | xargs wc -l | grep total || echo "  [!!] No total available"
 
 locs-total:
 	@echo "=> All the locs"
