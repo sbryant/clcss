@@ -18,6 +18,9 @@ define HELP
 	echo "make help"
 	echo "  This noise"
 	echo
+	echo "make locs"
+	echo "  Show some LOC stats"
+	echo
 	echo "make init"
 	echo "  Configures the submodules, vendor packages, user lisp dependencies"
 	echo "  and anything else needed to actually boot the package"
