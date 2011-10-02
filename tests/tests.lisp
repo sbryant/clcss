@@ -40,3 +40,10 @@
     (:seq (:word :div)
           (:word :span))
   (read-css "div span"))
+
+(def-test (can-parse-compound-tag-with-id :group parse-tests)
+    (:apply car (:seq (:equal :compound)
+                      (:word :ul)
+                      (:seq (:equal :id)
+                            (:word :nav))))
+  (read-css "ul#nav"))
