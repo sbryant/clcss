@@ -21,22 +21,23 @@
 (defun transform-css-path (path)
   (flet ((paren-syms (s)
            "Replace all symbols as CSS sees them with (:word symbol) to separate compund statements"
-                  (ppcre:regex-replace-all "([\\w_-]+)" s
-                                           "(:word \\1)"))
+           (ppcre:regex-replace-all "([\\w_-]+)" s
+                                    "(:word \\1)"))
 
          (group-compound (s)
            "Wrap groups of lists joined by a non-space into lists. e.g.:
              (:word p)#(:word my-p) => (:compound (:word p)#(:word my-p))"
-           (ppcre:regex-replace-all "(\\([^\\(]+?\\)[^\\w_-\\s]\\([^\\(]+?\\))+" s
+           (ppcre:regex-replace-all "(\\([^\\(]+?\\)[^\\w_\\s-]\\([^\\(]+?\\))+" s
                                     "(:compound \\1)"))
+
          (dot-to-bang (s)
            "Convert . to ! for lazy parsing"
            (ppcre:regex-replace-all "\\." s
                                     "!")))
 
-  (reduce #'(lambda (res proc) (funcall proc res))
-          (list #'paren-syms #'group-compound #'dot-to-bang)
-          :initial-value path)))
+    (reduce #'(lambda (res proc) (funcall proc res))
+            (list #'dot-to-bang #'paren-syms #'group-compound)
+            :initial-value path)))
 
 
 (defun read-css (path)
