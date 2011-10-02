@@ -20,6 +20,9 @@
 (def-criterion-alias (:id value) `(:seq (:equal :id)
                                         (:word ,value)))
 
+(def-criterion-alias (:class value) `(:seq (:equal :class)
+                                           (:word ,value)))
+
 ;; Groups
 (def-test-group parse-tests ()
   (:documentation "Tests basics of CSS string parsing"))
@@ -53,3 +56,7 @@
 (def-test (can-parse-just-id :group parse-tests)
     (:seq (:id :my-id))
   (read-css "#my-id"))
+
+(def-test (can-parse-just-class :group parse-tests)
+    (:seq (:class :my-class))
+  (read-css ".my-class"))
