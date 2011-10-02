@@ -1,8 +1,11 @@
 (in-package :clcss-tests)
 
+;; Old test data, using as reference
+;; TODO: Remove when cases are covered
 (defparameter *css-tests* `("h1" "div span" "div span p#poop" "ul#nav"
                             "#my-id" ".my-class" "div#body" "div.my-class" ".indent p"))
 
+;; Helpers
 (defgeneric is-word (form)
   (:method ((form list))
     (is-word (car form)))
