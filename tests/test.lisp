@@ -1,6 +1,14 @@
 (defpackage :clcss-tests
+  (:export
+   #:*css-tests*)
   (:use :cl :clcss))
 
-(in-package :clcss-tests)
+(in-package :clcss)
 
-(defparameter *css* `("h1" "#my-id" ".my-class" "div#body" "div.my-class" ".indent p"))
+(defparameter *css-tests* `("h1" "div span" "div span p#poop"
+                            "#my-id" ".my-class" "div#body" "div.my-class" ".indent p"))
+
+
+(defun try ()
+  (mapcar #'read-css
+          (subseq *css-tests* 0 3)))
