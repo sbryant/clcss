@@ -15,4 +15,4 @@
 
 ;; Tests
 (def-test (can-parse-nothing-to-nothing :group parse-tests)
-    (assert-null (read-css "")))
+    (:not :true) (read-css ""))
