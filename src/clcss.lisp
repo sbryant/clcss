@@ -9,7 +9,8 @@
   `(:id ,(read stream)))
 
 (defun read-css% (path &key (start 0) acc)
-  (let ((*readtable* (copy-readtable nil)))
+  (let ((*readtable* (copy-readtable nil))
+        (*package* (find-package :keyword)))
     (set-macro-character #\# #'css-id-macro-character t)
     (set-macro-character #\! #'css-class-macro-character t)
     (multiple-value-bind (data offset) (read-from-string path nil nil :start start :preserve-whitespace t)

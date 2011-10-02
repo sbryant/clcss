@@ -16,3 +16,8 @@
 ;; Tests
 (def-test (can-parse-nothing-to-nothing :group parse-tests)
     (:not :true) (read-css ""))
+
+(def-test (can-parse-simple-element :group parse-tests)
+    (:all (:apply caar (:equal :word))
+          (:apply cadar (:equal :h1)))
+  (read-css "h1"))
