@@ -5,3 +5,4 @@ scratch.lisp
 *.old
 /coverage/
 /.test/*
+/tests/results/*
