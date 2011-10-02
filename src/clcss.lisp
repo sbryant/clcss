@@ -13,9 +13,20 @@
         (t (read-css% path :start offset :acc (cons data acc)))))))
 
 (defun transform-css-path (path)
-  (ppcre:regex-replace-all "(\\([^\\(]+?\\)[^\\w_-\\s]\\([^\\(]+?\\))+"
-                           (ppcre:regex-replace-all "([\\w_-]+)" path "(:word \\1)")
-                           "(\\1)"))
+  (flet ((paren-syms (s)
+           "Replace all symbols as CSS sees them with (:word symbol) to separate compund statements"
+                  (ppcre:regex-replace-all "([\\w_-]+)" s
+                                           "(:word \\1)"))
+
+         (group-compound (s)
+           "Wrap groups of lists joined by a non-space into lists. e.g.:
+             (:word p)#(:word my-p) => (:compound (:word p)#(:word my-p))"
+           (ppcre:regex-replace-all "(\\([^\\(]+?\\)[^\\w_-\\s]\\([^\\(]+?\\))+" s
+                                    "(:compound \\1)")))
+
+  (reduce #'(lambda (res proc) (funcall proc res))
+          (list #'paren-syms #'group-compound)
+          :initial-value path)))
 
 
 (defun read-css (path)
