@@ -11,4 +11,4 @@
 
 (defun try ()
   (mapcar #'read-css
-          (subseq *css-tests* 0 3)))
+          (subseq *css-tests* 0 4)))
