@@ -47,6 +47,9 @@
 (def-test (can-parse-compound-tag-with-id :group parse-tests)
     (:seq (:seq (:equal :compound)
                 (:word :ul)
-                (:seq (:equal :id)
-                      (:word :nav))))
+                (:id :nav)))
   (read-css "ul#nav"))
+
+(def-test (can-parse-just-id :group parse-tests)
+    (:seq (:id :my-id))
+  (read-css "#my-id"))
