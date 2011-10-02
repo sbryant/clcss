@@ -1,4 +1,5 @@
 (defpackage :clcss
-  (:use :cl))
+  (:use :cl)
+  (:export :read-css))
 
 (in-package :clcss)  
