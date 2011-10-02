@@ -17,6 +17,9 @@
 (def-criterion-alias (:word value) `(:seq :is-word
                                           (:equal ,value)))
 
+(def-criterion-alias (:id value) `(:seq (:equal :id)
+                                        (:word ,value)))
+
 ;; Groups
 (def-test-group parse-tests ()
   (:documentation "Tests basics of CSS string parsing"))
