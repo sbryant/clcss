@@ -29,7 +29,8 @@
 
 ;; Tests
 (def-test (can-parse-nothing-to-nothing :group parse-tests)
-    (:not :true) (read-css ""))
+    (:not :true)
+  (read-css ""))
 
 (def-test (can-parse-simple-element :group parse-tests)
     (:seq (:word :h1))
