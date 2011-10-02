@@ -35,8 +35,7 @@
     (:seq (:word :h1))
   (read-css "h1"))
 
-(def-test (can-parse-nested-elements :group parse-tests
-                                     :fixtures parse-helpers)
+(def-test (can-parse-nested-elements :group parse-tests)
     (:seq (:word :div)
           (:word :span))
   (read-css "div span"))
