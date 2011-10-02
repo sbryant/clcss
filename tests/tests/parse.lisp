@@ -32,3 +32,10 @@
 (def-test (can-parse-just-class :group parse-tests)
     (:seq (:class :my-class))
   (read-css ".my-class"))
+
+(def-test (can-parse-tag-with-id-and-class :group parse-tests)
+    (:seq (:seq (:equal :compound)
+                (:word :div)
+                (:id :wrap)
+                (:class :main)))
+  (read-css "div#wrap.main"))
