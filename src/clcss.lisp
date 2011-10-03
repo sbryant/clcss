@@ -24,7 +24,7 @@
 (defmethod read-symbol ((fsm fsm) event)
   (cond 
     ((null event)
-     'emit-token)
+     (emit-token fsm event))
     ((ppcre:scan "[\\w-]" (string event))
      (append-to-token fsm event)
      'read-symbol)
@@ -35,28 +35,39 @@
     ((equal event #\#)
      (emit-token fsm event 'read-id))))
 
+(defmethod emit-class-token ((fsm fsm) event)
+  (setf (token-list fsm) 
+        (append (token-list fsm)
+                (list `(:class ,(coerce (current-token fsm) 'string)))))
+  (setf (current-token fsm) nil)
+  (read-symbol fsm event))
+
+(defmethod emit-id-token ((fsm fsm) event)
+  (setf (token-list fsm) 
+        (append (token-list fsm)
+                (list `(:id ,(coerce (current-token fsm) 'string)))))
+  (setf (current-token fsm) nil)
+  (read-symbol fsm event))
+
 (defmethod emit-token ((fsm fsm) event &optional (next-event 'stop))
-  (let ((prefix (cond 
-                  ((equal 'read-id (state fsm)) :id)
-                  ((equal 'read-class (state fsm)) :class)
-                  (t :word))))
-    ;;(format t "Emitting token: ~A~%" (current-token fsm))
+  (format t "state : ~A~%" (state fsm))
+  (unless (null (current-token fsm))
     (setf (token-list fsm) 
           (append (token-list fsm) 
-                  (list `(,prefix ,(coerce (current-token fsm) 'string)))))
-    (setf (current-token fsm) nil)
-    next-event))
+                  (list `(:word ,(coerce (current-token fsm) 'string)))))
+    (setf (current-token fsm) nil))
+  next-event)
 
 (defmethod append-to-token ((fsm fsm) c)
   (setf (current-token fsm) (append (current-token fsm) (list c))))
 
 (defmethod read-class ((fsm fsm) event)
   (cond 
-    ((null event) (read-symbol fsm event))
+    ((null event) (emit-class-token fsm event))
     ((ppcre:scan "[\\w-]" (string event))
      (append-to-token fsm event)
      'read-class)
-    (t (read-symbol fsm event))))
+    (t (emit-class-token fsm event))))
   
 (defmethod read-space ((fsm fsm) event)
   (if (equal event #\Space)
@@ -65,10 +76,11 @@
 
 (defmethod read-id ((fsm fsm) event)
   (cond 
+    ((null event) (emit-id-token fsm event))
     ((ppcre:scan "[\\w-]" (string event))
      (append-to-token fsm event)
      'read-id)
-    (t (read-symbol fsm event))))
+    (t (emit-id-token fsm event))))
 
 (defun path-to-tokens (path)
   (tokenize-stream (make-string-input-stream path)))
