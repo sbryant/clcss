@@ -38,14 +38,20 @@
 (defmethod emit-class-token ((fsm fsm) event)
   (setf (token-list fsm) 
         (append (token-list fsm)
-                (list `(:class ,(coerce (current-token fsm) 'string)))))
+                (list `(:class ,(intern (string-upcase 
+                                          (coerce (current-token fsm) 
+                                                  'string)) 
+                                         (find-package :keyword))))))
   (setf (current-token fsm) nil)
   (read-symbol fsm event))
 
 (defmethod emit-id-token ((fsm fsm) event)
   (setf (token-list fsm) 
         (append (token-list fsm)
-                (list `(:id ,(coerce (current-token fsm) 'string)))))
+                (list `(:id ,(intern (string-upcase 
+                                          (coerce (current-token fsm) 
+                                                  'string)) 
+                                         (find-package :keyword))))))
   (setf (current-token fsm) nil)
   (read-symbol fsm event))
 
@@ -54,7 +60,10 @@
   (unless (null (current-token fsm))
     (setf (token-list fsm) 
           (append (token-list fsm) 
-                  (list `(:word ,(coerce (current-token fsm) 'string)))))
+                  (list `(:word , (intern (string-upcase 
+                                          (coerce (current-token fsm) 
+                                                  'string)) 
+                                         (find-package :keyword))))))
     (setf (current-token fsm) nil))
   next-event)
 
@@ -90,3 +99,6 @@
        (fsm (make-token-fsm) (funcall fsm c)))
       ((or (null fsm) (equal (state fsm) 'stop)) fsm)
     (format t "c: ~A fsm: ~A~%" c fsm)))
+
+(defun read-css (path)
+  (token-list (path-to-tokens path)))
