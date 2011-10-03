@@ -3,8 +3,7 @@
 (defclass fsm (c2mop:funcallable-standard-object)
   ((state :initarg :state :accessor state :initform nil)
    (token-list :initarg :token-list :accessor token-list :initform nil)
-   (current-token :initform nil :accessor current-token)
-   (prefix :initform nil :accessor token-prefix))
+   (current-token :initform nil :accessor current-token))
   (:metaclass c2mop:funcallable-standard-class))
 
 (defmethod initialize-instance :before ((fsm fsm) &key)
@@ -44,7 +43,6 @@
     (format t "Emitting token: ~A~%" (current-token fsm))
     (setf (token-list fsm) (append (token-list fsm) (list (list prefix (current-token fsm)))))
     (setf (current-token fsm) nil)
-    (setf (token-prefix fsm) nil)
     next-event))
 
 (defmethod append-to-token ((fsm fsm) c)
