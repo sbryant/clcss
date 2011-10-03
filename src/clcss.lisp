@@ -26,12 +26,28 @@
     ((ppcre:scan "[\\w-]" (string event))
      'read-symbol)
     ((equal event #\Space)
-     'read-space)))
-
+     'read-space)
+    ((equal event #\.)
+     'read-class)
+    ((equal event #\#)
+     'read-id)))
+  
+(defmethod read-class ((fsm fsm) event)
+  (cond 
+    ((ppcre:scan "[\\w-]" (string event))
+     'read-class)
+    (t 'read-symbol)))
+  
 (defmethod read-space ((fsm fsm) event)
   (if (equal event #\Space)
       'read-space
       (read-symbol fsm event)))
+
+(defmethod read-id ((fsm fsm) event)
+  (cond 
+    ((ppcre:scan "[\\w-]" (string event))
+     'read-id)
+    (t 'read-symbol)))
 
 (defun path-to-tokens (path)
   (tokenize-stream (make-string-input-stream path)))
