@@ -4,7 +4,8 @@
   (read-css% path))
 
 (defclass fsm (c2mop:funcallable-standard-object)
-  ((state :initarg :state :accessor state))
+  ((state :initarg :state :accessor state :initform nil)
+   (token-list :initarg :token-list :accessor token-list :initform nil))
   (:metaclass c2mop:funcallable-standard-class))
 
 (defmethod initialize-instance :before ((fsm fsm) &key)
