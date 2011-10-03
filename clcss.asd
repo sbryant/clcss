@@ -1,6 +1,6 @@
 (defsystem clcss
   :name "clcss"
-  :depends-on (:cl-ppcre)
+  :depends-on (:cl-ppcre :closer-mop)
   :in-order-to ((test-op (load-op clcss-tests)))
   :components ((:module "src"
                         :components ((:file "package")
