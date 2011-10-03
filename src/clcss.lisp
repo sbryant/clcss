@@ -10,8 +10,8 @@
   (c2mop:set-funcallable-instance-function 
    fsm 
    #'(lambda (event)
-       (format t "state: ~A~%" (state fsm))
-       (format t "event: ~A~%" event)
+      ;; (format t "state: ~A~%" (state fsm))
+      ;; (format t "event: ~A~%" event)
        (setf (state fsm) (funcall (state fsm) fsm event))
        fsm)))
        
@@ -40,8 +40,10 @@
                   ((equal 'read-id (state fsm)) :id)
                   ((equal 'read-class (state fsm)) :class)
                   (t :word))))
-    (format t "Emitting token: ~A~%" (current-token fsm))
-    (setf (token-list fsm) (append (token-list fsm) (list (list prefix (current-token fsm)))))
+    ;;(format t "Emitting token: ~A~%" (current-token fsm))
+    (setf (token-list fsm) 
+          (append (token-list fsm) 
+                  (list `(,prefix ,(coerce (current-token fsm) 'string)))))
     (setf (current-token fsm) nil)
     next-event))
 
@@ -75,4 +77,4 @@
   (do ((c (read-char stream nil nil) (read-char stream nil nil))
        (fsm (make-token-fsm) (funcall fsm c)))
       ((or (null fsm) (equal (state fsm) 'stop)) fsm)
-    (format t "c: ~A fsm: ~A token-list: ~A~%" c fsm (token-list fsm))))
+    (format t "c: ~A fsm: ~A~%" c fsm)))
