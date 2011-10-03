@@ -1,8 +1,5 @@
 (in-package :clcss)
 
-(defun read-css (path)
-  (read-css% path))
-
 (defclass fsm (c2mop:funcallable-standard-object)
   ((state :initarg :state :accessor state :initform nil)
    (token-list :initarg :token-list :accessor token-list :initform nil))
