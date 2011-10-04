@@ -10,8 +10,6 @@
   (c2mop:set-funcallable-instance-function 
    fsm 
    #'(lambda (event)
-      ;; (format t "state: ~A~%" (state fsm))
-      ;; (format t "event: ~A~%" event)
        (setf (state fsm) (funcall (state fsm) fsm event))
        fsm)))
        
@@ -29,7 +27,7 @@
      (append-to-token fsm event)
      'read-symbol)
     ((equal event #\Space)
-     (emit-token fsm event 'read-space))
+     (emit-token fsm event 'deciding-descendant))
     ((equal event #\.)
      (emit-token fsm event 'read-class))
     ((equal event #\#)
@@ -39,8 +37,7 @@
   (setf (token-list fsm) 
         (append (token-list fsm)
                 (list `(:class ,(intern (string-upcase 
-                                          (coerce (current-token fsm) 
-                                                  'string)) 
+                                          (coerce (current-token fsm) 'string)) 
                                          (find-package :keyword))))))
   (setf (current-token fsm) nil)
   (read-symbol fsm event))
@@ -49,21 +46,29 @@
   (setf (token-list fsm) 
         (append (token-list fsm)
                 (list `(:id ,(intern (string-upcase 
-                                          (coerce (current-token fsm) 
-                                                  'string)) 
-                                         (find-package :keyword))))))
+                                      (coerce (current-token fsm) 'string)) 
+                                     (find-package :keyword))))))
   (setf (current-token fsm) nil)
   (read-symbol fsm event))
+
+(defmethod emit-child-token ((fsm fsm))
+  (setf (token-list fsm)
+        (append (token-list fsm)
+                (list :immediate-child))))
+
+(defmethod emit-descendant-token ((fsm fsm))
+  (setf (token-list fsm)
+        (append (token-list fsm)
+                (list :descendant))))
 
 (defmethod emit-token ((fsm fsm) event &optional (next-event 'stop))
   (format t "state : ~A~%" (state fsm))
   (unless (null (current-token fsm))
     (setf (token-list fsm) 
           (append (token-list fsm) 
-                  (list `(:word , (intern (string-upcase 
-                                          (coerce (current-token fsm) 
-                                                  'string)) 
-                                         (find-package :keyword))))))
+                  (list (intern (string-upcase 
+                                 (coerce (current-token fsm) 'string)) 
+                                (find-package :keyword)))))
     (setf (current-token fsm) nil))
   next-event)
 
@@ -77,6 +82,16 @@
      (append-to-token fsm event)
      'read-class)
     (t (emit-class-token fsm event))))
+
+(defmethod deciding-descendant ((fsm fsm) event)
+  (cond 
+    ((equal event #\Space)
+     'read-space)
+    ((equal event #\>)
+     (emit-child-token fsm)
+     'read-space)
+    (t (emit-descendant-token fsm)
+       (read-symbol fsm event))))
   
 (defmethod read-space ((fsm fsm) event)
   (if (equal event #\Space)
