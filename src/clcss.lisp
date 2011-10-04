@@ -61,6 +61,11 @@
         (append (token-list fsm)
                 (list :descendant))))
 
+(defmethod emit-adjacent-sibling-token ((fsm fsm))
+  (setf (token-list fsm)
+        (append (token-list fsm)
+                (list :adjacent-sibling))))
+
 (defmethod emit-token ((fsm fsm) event &optional (next-event 'stop))
   (format t "state : ~A~%" (state fsm))
   (unless (null (current-token fsm))
@@ -86,12 +91,23 @@
 (defmethod deciding-descendant ((fsm fsm) event)
   (cond 
     ((equal event #\Space)
-     'read-space)
+     'deciding-descendant)
     ((equal event #\>)
      (emit-child-token fsm)
      'read-space)
+    ((equal event #\+)
+     'read-adjacent-sibling)
     (t (emit-descendant-token fsm)
        (read-symbol fsm event))))
+
+(defmethod read-adjacent-sibling ((fsm fsm) event)
+  (cond
+    ((equal event #\Space)
+     'read-adjacent-sibling)
+    ((ppcre:scan "[\\w-]" (string event))
+     (emit-adjacent-sibling-token fsm)
+     (read-symbol fsm event))
+    (t 'read-symbol)))
   
 (defmethod read-space ((fsm fsm) event)
   (if (equal event #\Space)
