@@ -131,5 +131,13 @@
       ((or (null fsm) (equal (state fsm) 'stop)) fsm)
     (format t "c: ~A fsm: ~A~%" c fsm)))
 
+(defun tokens-to-tree (tokens)
+  (cond 
+    ((null tokens) nil)
+    ((equal :descendant (first tokens))
+     (list (cons :descendant 
+                 (list (tokens-to-tree (cdr tokens))))))
+    (t (cons (car tokens) (tokens-to-tree (cdr tokens))))))
+
 (defun read-css (path)
-  (token-list (path-to-tokens path)))
+  (tokens-to-tree (token-list (path-to-tokens path))))
