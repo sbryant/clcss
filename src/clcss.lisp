@@ -22,16 +22,15 @@
 (defmethod read-symbol ((fsm fsm) event)
   (cond 
     ((null event)
-     (emit-token fsm event))
+     (emit-token fsm event) 'stop)
     ((ppcre:scan "[\\w-]" (string event))
-     (append-to-token fsm event)
-     'read-symbol)
+     (append-to-token fsm event) 'read-symbol)
     ((equal event #\Space)
-     (emit-token fsm event 'deciding-descendant))
+     (emit-token fsm event) 'deciding-descendant)
     ((equal event #\.)
-     (emit-token fsm event 'read-class))
+     (emit-token fsm event) 'read-class)
     ((equal event #\#)
-     (emit-token fsm event 'read-id))))
+     (emit-token fsm event) 'read-id)))
 
 (defmethod emit-class-token ((fsm fsm) event)
   (setf (token-list fsm) 
@@ -71,11 +70,10 @@
   (unless (null (current-token fsm))
     (setf (token-list fsm) 
           (append (token-list fsm) 
-                  (list (intern (string-upcase 
+                  (list `(:symbol ,(intern (string-upcase 
                                  (coerce (current-token fsm) 'string)) 
-                                (find-package :keyword)))))
-    (setf (current-token fsm) nil))
-  next-event)
+                                (find-package :keyword))))))
+    (setf (current-token fsm) nil)))
 
 (defmethod append-to-token ((fsm fsm) c)
   (setf (current-token fsm) (append (current-token fsm) (list c))))
