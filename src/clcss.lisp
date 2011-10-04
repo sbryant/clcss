@@ -65,15 +65,14 @@
         (append (token-list fsm)
                 (list :adjacent-sibling))))
 
-(defmethod emit-token ((fsm fsm) event &optional (next-event 'stop))
-  (format t "state : ~A~%" (state fsm))
+(defmethod emit-token ((fsm fsm) event)
   (unless (null (current-token fsm))
     (setf (token-list fsm) 
           (append (token-list fsm) 
                   (list `(:symbol ,(intern (string-upcase 
                                  (coerce (current-token fsm) 'string)) 
-                                (find-package :keyword))))))
-    (setf (current-token fsm) nil)))
+                                (find-package :keyword)))))
+          (current-token fsm) nil)))
 
 (defmethod append-to-token ((fsm fsm) c)
   (setf (current-token fsm) (append (current-token fsm) (list c))))
