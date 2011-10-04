@@ -11,18 +11,17 @@
   (read-css ""))
 
 (def-test (can-parse-simple-element :group parse-tests)
-    (:seq (:word :h1))
+    (:seq (:equal :h1))
   (read-css "h1"))
 
 (def-test (can-parse-nested-elements :group parse-tests)
-    (:seq (:word :div)
-          (:word :span))
-  (read-css "div span"))
+     (:seq (:equal :div)
+           (:equal '(:descendant (:span))))
+   (read-css "div span"))
 
 (def-test (can-parse-compound-tag-with-id :group parse-tests)
-    (:seq (:seq (:equal :compound)
-                (:word :ul)
-                (:id :nav)))
+    (:seq (:equal :ul)
+          (:id :nav))
   (read-css "ul#nav"))
 
 (def-test (can-parse-just-id :group parse-tests)
@@ -34,8 +33,7 @@
   (read-css ".my-class"))
 
 (def-test (can-parse-tag-with-id-and-class :group parse-tests)
-    (:seq (:seq (:equal :compound)
-                (:word :div)
-                (:id :wrap)
-                (:class :main)))
+    (:seq (:equal :div)
+          (:id :wrap)
+          (:class :main))
   (read-css "div#wrap.main"))

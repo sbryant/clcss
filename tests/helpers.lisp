@@ -8,14 +8,15 @@
     (equal form :word)))
 
 ;; Criteria
-(def-criterion-alias (:is-word) '(:predicate is-word))
-
-(def-criterion-alias (:word value) `(:seq :is-word
-                                          (:equal ,value)))
 
 (def-criterion-alias (:id value) `(:seq (:equal :id)
-                                        (:word ,value)))
+                                        (:all
+                                         (:predicate symbolp)
+                                         (:equal ,value))))
 
 (def-criterion-alias (:class value) `(:seq (:equal :class)
-                                           (:word ,value)))
+                                           (:all 
+                                            (:predicate symbolp)
+                                            (:equal ,value))))
+
 
