@@ -129,12 +129,34 @@
     (format t "c: ~A fsm: ~A~%" c fsm)))
 
 (defun tokens-to-tree (tokens)
-  (cond 
-    ((null tokens) nil)
-    ((equal :descendant (first tokens))
-     (list (cons :descendant 
-                 (list (tokens-to-tree (cdr tokens))))))
-    (t (cons (car tokens) (tokens-to-tree (cdr tokens))))))
+  (labels ((type-and-name (tokens)
+               (list (first (first tokens)) (second (first tokens))))
+           (rest-of-tokens (tokens)
+             (rest tokens))
+           (compound-iter (tokens list)
+             (cond 
+               ((null tokens)
+                (format t "null tokens~%")
+                (values tokens (reverse list)))
+               ((equal (first tokens) :descendant)
+                (format t "descendants tokens ~A list ~A~%" tokens list)
+                (values tokens (reverse list)))
+               (t (compound-iter (rest-of-tokens tokens) (cons (type-and-name tokens) list)))))
+           (compound (tokens)
+             (multiple-value-bind (tree compounds) (compound-iter tokens nil)
+               (cond
+                 ((= 1 (length compounds))
+                  (cons (first compounds) (list (list :descendants (tokens-to-tree (rest tree))))))
+                 ((null tree)
+                  (list :compound compounds))
+                 (t
+                  (cons (list :compound compounds)
+                        (list (list :descendants (tokens-to-tree (rest tree))))))))))
+    (format t "tokens ~A~%" tokens)
+    (cond 
+      ((null tokens) nil)
+      ((= (length tokens) 1) tokens)
+      (t (compound tokens)))))
 
 (defun read-css (path)
   (tokens-to-tree (token-list (path-to-tokens path))))
