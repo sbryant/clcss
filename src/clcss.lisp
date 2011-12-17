@@ -7,12 +7,12 @@
   (:metaclass c2mop:funcallable-standard-class))
 
 (defmethod initialize-instance :before ((fsm fsm) &key)
-  (c2mop:set-funcallable-instance-function 
-   fsm 
+  (c2mop:set-funcallable-instance-function
+   fsm
    #'(lambda (event)
        (setf (state fsm) (funcall (state fsm) fsm event))
        fsm)))
-       
+
 (defun make-token-fsm ()
   (make-instance 'fsm :state 'read-symbol))
 
@@ -20,7 +20,7 @@
   (format s "#<FSM state: ~A>" (state fsm)))
 
 (defmethod read-symbol ((fsm fsm) event)
-  (cond 
+  (cond
     ((null event)
      (emit-token fsm event) 'stop)
     ((ppcre:scan "[\\w-]" (string event))
@@ -33,19 +33,19 @@
      (emit-token fsm event) 'read-id)))
 
 (defmethod emit-class-token ((fsm fsm) event)
-  (setf (token-list fsm) 
+  (setf (token-list fsm)
         (append (token-list fsm)
-                (list `(:class ,(intern (string-upcase 
-                                          (coerce (current-token fsm) 'string)) 
+                (list `(:class ,(intern (string-upcase
+                                          (coerce (current-token fsm) 'string))
                                          (find-package :keyword))))))
   (setf (current-token fsm) nil)
   (read-symbol fsm event))
 
 (defmethod emit-id-token ((fsm fsm) event)
-  (setf (token-list fsm) 
+  (setf (token-list fsm)
         (append (token-list fsm)
-                (list `(:id ,(intern (string-upcase 
-                                      (coerce (current-token fsm) 'string)) 
+                (list `(:id ,(intern (string-upcase
+                                      (coerce (current-token fsm) 'string))
                                      (find-package :keyword))))))
   (setf (current-token fsm) nil)
   (read-symbol fsm event))
@@ -67,10 +67,10 @@
 
 (defmethod emit-token ((fsm fsm) event)
   (unless (null (current-token fsm))
-    (setf (token-list fsm) 
-          (append (token-list fsm) 
-                  (list `(:symbol ,(intern (string-upcase 
-                                 (coerce (current-token fsm) 'string)) 
+    (setf (token-list fsm)
+          (append (token-list fsm)
+                  (list `(:symbol ,(intern (string-upcase
+                                 (coerce (current-token fsm) 'string))
                                 (find-package :keyword)))))
           (current-token fsm) nil)))
 
@@ -78,7 +78,7 @@
   (setf (current-token fsm) (append (current-token fsm) (list c))))
 
 (defmethod read-class ((fsm fsm) event)
-  (cond 
+  (cond
     ((null event) (emit-class-token fsm event))
     ((ppcre:scan "[\\w-]" (string event))
      (append-to-token fsm event)
@@ -86,7 +86,7 @@
     (t (emit-class-token fsm event))))
 
 (defmethod deciding-descendant ((fsm fsm) event)
-  (cond 
+  (cond
     ((equal event #\Space)
      'deciding-descendant)
     ((equal event #\>)
@@ -105,14 +105,14 @@
      (emit-adjacent-sibling-token fsm)
      (read-symbol fsm event))
     (t 'read-symbol)))
-  
+
 (defmethod read-space ((fsm fsm) event)
   (if (equal event #\Space)
       'read-space
       (read-symbol fsm event)))
 
 (defmethod read-id ((fsm fsm) event)
-  (cond 
+  (cond
     ((null event) (emit-id-token fsm event))
     ((ppcre:scan "[\\w-]" (string event))
      (append-to-token fsm event)
@@ -131,9 +131,9 @@
 (defun tokens-to-tree (tokens)
   (labels ((compound (tokens list)
              (format t "compound tokens ~A and list ~A.~%" tokens list)
-             (cond 
+             (cond
                ((null tokens) (reverse list))
-               ((equal (first tokens) :descendant) 
+               ((equal (first tokens) :descendant)
                 (reverse (cons (descend (rest tokens)) (reverse list))))
                (t
                 (compound (cdr tokens) (cons (first tokens) list)))))
@@ -154,7 +154,7 @@
                       (format t "decided on compound branch: tokens ~A.~%" tokens)
                       (compound-or-descend tokens 'compound))))))
     (format t "tokens ~A~%" tokens)
-    (cond 
+    (cond
       ((null tokens) nil)
       ((= (length tokens) 1) tokens)
       (t (compound-or-descend tokens 'decide)))))
@@ -174,27 +174,27 @@
 (defun compile-tree (tree html)
   (eval
    `(macrolet ((:compound (&rest predicates)
-                 (lambda (data) 
+                 (lambda (data)
                    (format t "We are in the :compound (~A) lambda, we got ~A ~%" predicates data)
                    (compound-match-p predicates data)))
                (:symbol (symbol)
                  (lambda (data)
                    (format t "We are in the :symbol (~A) lambda, we got ~A ~%" symbol data)
-                   (cond 
-                     ((equal (first data) symbol) 
+                   (cond
+                     ((equal (first data) symbol)
                       (format t "returning ~A~%" data)
-                      data) 
-                      (t 
+                      data)
+                      (t
                        (format t "returning nil~%")
                        nil))))
                (:descendant (&rest predicates)
                  (lambda (data)
                    (mapc (lambda (element) (format t "subtree has a: ~A~%" element)) subtree)
                    (format t "We are in the :descendant (~A) We got ~A~%" subtree data)))
-               (:id (symbol) 
+               (:id (symbol)
                  (lambda (data)
                    (format t "We are in the :id (~A) lambda, we got ~A ~%" symbol data)))
-               (:class (symbol) 
+               (:class (symbol)
                  (lambda (data)
                    (format t "We are in the :class (~A), we got ~A lambda~%" symbol data))))
       (lambda (html)

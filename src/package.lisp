@@ -2,4 +2,4 @@
   (:use :cl)
   (:export :read-css))
 
-(in-package :clcss)  
+(in-package :clcss)
