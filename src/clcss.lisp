@@ -199,17 +199,22 @@
   (lambda (data)
     (format t "Symbol matching ~A with data ~A~%" symbol data)
     (if (listp data)
-      (if (equalp symbol (car data))
-          t
-        nil))))
+      (when (equalp symbol (car data))
+          t))))
 
 (defun make-class-matcher (symbol)
   (lambda (data)
     (format t "Class matching ~A with data ~A~%" symbol data)
     (if (listp data)
-        (if (string-equal (symbol-name symbol) (cadr (assoc :class (second data))))
-            t
-          nil))))
+        (when (string-equal (symbol-name symbol) (cadr (assoc :class (second data))))
+            t))))
+
+(defun make-id-matcher (symbol)
+  (lambda (data)
+    (format t "Id matching ~A with data ~A~%" symbol data)
+    (if (listp data)
+        (when (string-equal (symbol-name symbol) (cadr (assoc :id (second data))))
+          t))))
 
 (defun compile-tree (tree)
   "Take in a tree of css and spit on a function that operates on node
@@ -226,7 +231,8 @@ reference. Usually this will be be a css expression matcher."
                  (format t "We are in the :descendant ~A ~%" predicates)
                  (make-descendant-matcher predicates))
                (:id (symbol)
-                 (format t "We are in the :id (~A)~%" symbol))
+                 (format t "We are in the :id (~A)~%" symbol)
+                 (make-id-matcher symbol))
                (:class (symbol)
                  (format t "We are in the :class (~A)~%" symbol)
                  (make-class-matcher symbol)))
