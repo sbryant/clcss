@@ -171,7 +171,7 @@
          (matched-nodes (funcall matcher next-node)))
     (cond
      ((null node) nil)
-     (matched-nodes matched-nodes)
+     (matched-nodes next-node)
      ((stringp node) nil)
      ((and (not (null node)) (listp node))
       (or (matches-p matcher (caddr node))
