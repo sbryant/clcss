@@ -11,38 +11,33 @@
   (read-css ""))
 
 (def-test (can-parse-simple-element :group parse-tests)
-    (:seq (:symbol :symbol)
-          (:symbol :h1))
+    (:css-symbol :h1)
   (read-css "h1"))
 
 (def-test (can-parse-nested-elements :group parse-tests)
-    (:seq (:symbol :compound)
-          (:seq (:symbol :symbol) (:symbol :div))
-          (:seq (:symbol :descendant)
-                (:seq (:symbol :symbol)
-                      (:symbol :span))))
+    (:css-compound
+          (:css-symbol :div)
+          (:css-descendant
+           (:css-symbol :span)))
    (read-css "div span"))
 
 (def-test (can-parse-compound-tag-with-id :group parse-tests)
-    (:seq (:symbol :compound)
-          (:seq (:symbol :symbol)
-                (:symbol :ul))
-          (:seq (:symbol :id)
-                (:symbol :nav)))
+    (:css-compound
+     (:css-symbol :ul)
+     (:css-id :nav))
   (read-css "ul#nav"))
 
 (def-test (can-parse-just-id :group parse-tests)
-    (:seq (:symbol :id) (:symbol :my-id))
+    (:css-id :my-id)
   (read-css "#my-id"))
 
 (def-test (can-parse-just-class :group parse-tests)
-    (:seq (:symbol :class)
-          (:symbol :my-class))
+    (:css-class :my-class)
   (read-css ".my-class"))
 
 (def-test (can-parse-tag-with-id-and-class :group parse-tests)
-    (:seq (:symbol :compound)
-          (:seq (:symbol :symbol) (:symbol :div))
-          (:seq (:symbol  :id) (:symbol :wrap))
-          (:seq (:symbol  :class) (:symbol :main)))
+    (:css-compound
+     (:css-symbol :div)
+     (:css-id :wrap)
+     (:css-class :main))
   (read-css "div#wrap.main"))
