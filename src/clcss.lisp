@@ -130,35 +130,35 @@
 
 (defun tokens-to-tree (tokens)
   (labels ((compound (tokens list)
-             (cond
-              ((null tokens)
-               (format t "returning list~%")
-               list)
-               ((equal (first tokens) :descendant)
-                (format t "found descendant ~A tokens while compouding with list ~A~%" tokens list)
-                `(,@list ,(compound-or-descend tokens)))
-               (t
-                (format t "compounding tokens ~A and list ~A.~%" tokens list)
-                (compound (cdr tokens) (append list (list (first tokens)))))))
+                     (cond
+                      ((null tokens)
+                       (format t "returning list ~A ~%" list)
+                       list)
+                      ((equal (first tokens) :descendant)
+                       (format t "found descendant ~A tokens while compouding with list ~A~%" tokens list)
+                       `(,@list ,(compound-or-descend tokens)))
+                      (t
+                       (format t "compounding tokens ~A and list ~A.~%" tokens list)
+                       (compound (cdr tokens) (append list (list (first tokens)))))))
            (descend (tokens)
-             (format t "descending with tokens ~A.~%" tokens)
-             (let ((tree (tokens-to-tree tokens)))
-               `(:descendant ,@(if (= 1 (length tree))
-                                   tree
-                                 (list tree)))))
+                    (format t "descending with tokens ~A.~%" tokens)
+                    (let ((tree (tokens-to-tree tokens)))
+                      `(:descendant ,@(if (= 1 (length tree))
+                                          tree
+                                        (list tree)))))
            (compound-or-descend (tokens)
-             (cond
-              ((equal (first tokens) :descendant)
-               (format t "descendant branch: tokens ~A.~%" tokens)
-               (descend (cdr tokens)))
-              (t
-               (format t "compound branch: tokens ~A.~%" tokens)
-               `(:compound ,@(compound tokens nil))))))
+                                (cond
+                                 ((equal (first tokens) :descendant)
+                                  (format t "descendant branch: tokens ~A.~%" tokens)
+                                  (descend (cdr tokens)))
+                                 (t
+                                  (format t "compound branch: tokens ~A.~%" tokens)
+                                  `(:compound ,@(compound tokens nil))))))
     (format t "tokens ~A~%" tokens)
     (cond
-      ((null tokens) nil)
-      ((= (length tokens) 1) (car tokens))
-      (t (compound-or-descend tokens)))))
+     ((null tokens) nil)
+     ((= (length tokens) 1) (car tokens))
+     (t (compound-or-descend tokens)))))
 
 (defun read-css (path)
   (tokens-to-tree (token-list (path-to-tokens path))))

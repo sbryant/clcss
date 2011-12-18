@@ -1,7 +1,7 @@
-(defsystem clcss
+(asdf:defsystem clcss
   :name "clcss"
-  :depends-on (:cl-ppcre :closer-mop)
-  :in-order-to ((test-op (load-op clcss-tests)))
+  :depends-on (:cl-ppcre :closer-mop :closure-html)
+  :in-order-to ((test-op (load-op :clcss-tests)))
   :components ((:module "src"
                         :components ((:file "package")
                                      (:file "clcss" :depends-on ("package"))))))
