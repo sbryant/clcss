@@ -10,4 +10,5 @@
                              (:file "groups" :depends-on ("package"))
 
                              (:module "tests" :depends-on ("helpers" "groups") :components
-                                      ((:file "parse")))))))
+                                      ((:file "parse")
+                                       (:file "matching")))))))
