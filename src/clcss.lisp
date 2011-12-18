@@ -160,10 +160,26 @@
 (defun read-css (path)
   (tokens-to-tree (token-list (path-to-tokens path))))
 
-(defun matches-p (predicate html)
-  (if (funcall predicate html)
-      html
-      nil))
+(defun next-node (node)
+  (let ((head (when (listp node) (car node))))
+    (cond ((listp head)
+           (or (cadddr head) (caddr head)))
+          (t node)))) ;; text nodes n stuff
+
+(defun matches-p (matcher node)
+  (let* ((next-node (next-node node))
+         (matched-nodes (funcall matcher next-node)))
+    (cond
+     ((null node) nil)
+     (matched-nodes matched-nodes)
+     ((stringp node) nil)
+     ((and (not (null node)) (listp node))
+      (or (matches-p matcher (caddr node))
+          (matches-p matcher (cdddr node)))))))
+
+
+(defun make-path-matcher (path)
+  (compile-tree (read-css path)))
 
 (defun make-compound-matcher (predicates)
   (format t "Predicate checker ~A ~%" predicates)
@@ -182,18 +198,22 @@
 (defun make-symbol-matcher (symbol)
   (lambda (data)
     (format t "Symbol matching ~A with data ~A~%" symbol data)
-    (if (equalp symbol (car data))
-        t
-      nil)))
+    (if (listp data)
+      (if (equalp symbol (car data))
+          t
+        nil))))
 
 (defun make-class-matcher (symbol)
   (lambda (data)
     (format t "Class matching ~A with data ~A~%" symbol data)
-    (if (equalp symbol (getf (second data) :class))
-        t
-      nil)))
+    (if (listp data)
+        (if (string-equal (symbol-name symbol) (cadr (assoc :class (second data))))
+            t
+          nil))))
 
 (defun compile-tree (tree)
+  "Take in a tree of css and spit on a function that operates on node
+reference. Usually this will be be a css expression matcher."
   (format t "Got Tree ~A~%Expanding...~%" tree)
   (eval
    `(macrolet ((:compound (&rest predicates)
@@ -211,3 +231,4 @@
                  (format t "We are in the :class (~A)~%" symbol)
                  (make-class-matcher symbol)))
       ,@(list tree))))
+
