@@ -1,21 +1,25 @@
 (in-package :clcss-tests)
 
 ;; Helpers
-(defgeneric is-word (form)
-  (:method ((form list))
-    (is-word (car form)))
-  (:method ((form symbol))
-    (equal form :word)))
+
 
 ;; Criteria
-(def-criterion-alias (:is-word) '(:predicate is-word))
+(def-criterion-alias (:css-compound &rest criteria)
+  `(:seq (:symbol :compound)
+         ,@criteria))
 
-(def-criterion-alias (:word value) `(:seq :is-word
-                                          (:equal ,value)))
+(def-criterion-alias (:css-descendant &rest criteria)
+  `(:seq (:symbol :descendant)
+         ,@criteria))
 
-(def-criterion-alias (:id value) `(:seq (:equal :id)
-                                        (:word ,value)))
+(def-criterion-alias (:css-symbol symbol)
+    `(:seq (:symbol :symbol)
+           (:symbol ,symbol)))
 
-(def-criterion-alias (:class value) `(:seq (:equal :class)
-                                           (:word ,value)))
+(def-criterion-alias (:css-id id)
+    `(:seq (:symbol :id)
+           (:symbol ,id)))
 
+(def-criterion-alias (:css-class class)
+    `(:seq (:symbol :class)
+           (:symbol ,class)))
